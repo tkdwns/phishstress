@@ -58,10 +58,6 @@ jobs:
           docker rm -f phishstress-ci
           exit 1
 
-  # Day 12에 활성화 — 스트레스 스위트 성능 하한 게이트.
-  # 지금은 자리만 잡아두고 스킵한다.
-  robustness-gate:
-    runs-on: ubuntu-latest
-    if: false
-    steps:
-      - run: echo "Day 12에 활성화: 스트레스 스위트 회귀 검사"
+# Day 12에 robustness-gate 잡을 추가한다.
+# 스트레스 스위트를 PR마다 돌려 축별 성능이 기준선 대비 임계 이상 떨어지면 FAIL시키고,
+# 성능 델타 표를 PR 코멘트로 게시한다. 자세한 내용은 docs/PROJECT_CHARTER.md 3.5절.

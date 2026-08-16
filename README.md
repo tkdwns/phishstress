@@ -7,7 +7,7 @@
 > 이 프로젝트는 그 간극을 **측정 가능한 벤치마크**로 만들고, 간극을 좁힌 판별기와
 > 이를 상시 감시하는 서빙 파이프라인을 만든다.
 
-[![CI](https://github.com/OWNER/phishstress/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/phishstress/actions/workflows/ci.yml)
+[![CI](https://github.com/tkdwns/phishstress/actions/workflows/ci.yml/badge.svg)](https://github.com/tkdwns/phishstress/actions/workflows/ci.yml)
 
 ---
 
@@ -45,6 +45,7 @@
 | Day | 산출물 | 상태 |
 |---|---|---|
 | 1 | Detector 플러그인 계약, 링버퍼, 정책 레이어, WebSocket 게이트웨이, Docker, CI | ✅ 완료 |
+| 2 | CI 그린화, 저장소 설정 검증 테스트, 줄바꿈 정규화 | ✅ 완료 |
 | 3–4 | 평가 프로토콜, KO-VP-Stress 축 A(적대적 문구)·축 C(전사 오류) | ⬜ |
 | 5–7 | 텍스트 판별기 학습, 붕괴 재현, 증강 학습으로 Gap 축소 | ⬜ |
 | 8–10 | 축 B(코덱 열화), 음성 판별기, STT 통합 | ⬜ |
@@ -58,9 +59,9 @@
 ### Day 1 검증 결과
 
 ```
-95 passed in 0.66s      # pytest
+105 passed              # pytest — Python 3.10 / 3.11 / 3.12 전부
 All checks passed!      # ruff check
-19 files formatted      # ruff format --check
+25 files formatted      # ruff format --check
 ```
 
 실제 uvicorn 서버 대상 E2E 스모크 (`bench/smoke_client.py`):
