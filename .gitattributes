@@ -1,0 +1,26 @@
+# 저장소 안에서는 항상 LF로 정규화한다.
+# Windows에서 작업하고 CI는 Linux에서 도는 구성이라, 이게 없으면
+# 줄바꿈 차이만으로 diff가 어지러워지고 ruff format --check가 흔들릴 수 있다.
+* text=auto eol=lf
+
+# 실행 환경이 CRLF를 못 견디는 파일들 — 명시적으로 LF 고정
+*.sh          text eol=lf
+Dockerfile    text eol=lf
+*.yml         text eol=lf
+*.yaml        text eol=lf
+*.py          text eol=lf
+*.toml        text eol=lf
+*.md          text eol=lf
+
+# 바이너리 — 변환 금지
+*.png         binary
+*.jpg         binary
+*.wav         binary
+*.flac        binary
+*.mp3         binary
+*.pt          binary
+*.onnx        binary
+*.bundle      binary
+
+# GitHub 언어 통계에서 문서를 제외해 Python 비율이 제대로 보이게 한다
+docs/**       linguist-documentation

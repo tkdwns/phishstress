@@ -1,0 +1,27 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      # Redis가 떠 있으면 세션 상태를 공유하고, 죽어 있으면 인메모리로 자동 폴백한다.
+      REDIS_URL: redis://redis:6379/0
+      SESSION_TTL_SEC: "300"
+      SAMPLE_RATE: "16000"
+      WINDOW_SEC: "3.0"
+      HOP_SEC: "1.0"
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    # 통화 상태는 휘발성이어야 한다 — 디스크 영속화를 끈다 (docs/ETHICS.md)
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped

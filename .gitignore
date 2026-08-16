@@ -1,0 +1,22 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.DS_Store
+.idea/
+.vscode/
+# 데이터와 모델은 저장소에 넣지 않는다 (docs/ETHICS.md)
+data/
+models/
+*.wav
+*.flac
+*.mp3
+*.pt
+*.onnx

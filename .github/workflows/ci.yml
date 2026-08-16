@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install
+        run: pip install -e ".[dev]"
+
+      - name: Ruff lint
+        run: ruff check .
+
+      - name: Ruff format check
+        run: ruff format --check .
+
+      - name: Tests
+        run: pytest -q
+
+  docker-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t phishstress:ci .
+
+      - name: Smoke test container
+        run: |
+          docker run -d --name phishstress-ci -p 8000:8000 phishstress:ci
+          for i in $(seq 1 30); do
+            if curl -fs http://127.0.0.1:8000/health > /dev/null; then
+              echo "healthy after ${i}s"
+              curl -s http://127.0.0.1:8000/health
+              docker rm -f phishstress-ci
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "health check failed"
+          docker logs phishstress-ci
+          docker rm -f phishstress-ci
+          exit 1
+
+  # Day 12에 활성화 — 스트레스 스위트 성능 하한 게이트.
+  # 지금은 자리만 잡아두고 스킵한다.
+  robustness-gate:
+    runs-on: ubuntu-latest
+    if: false
+    steps:
+      - run: echo "Day 12에 활성화: 스트레스 스위트 회귀 검사"
