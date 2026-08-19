@@ -12,9 +12,10 @@ htmlcov/
 .DS_Store
 .idea/
 .vscode/
-# 데이터와 모델은 저장소에 넣지 않는다 (docs/ETHICS.md)
-data/
-models/
+# 내려받은 원본 데이터와 학습된 모델은 저장소에 넣지 않는다 (docs/ETHICS.md).
+# 앞의 슬래시가 중요하다 — 이게 없으면 소스 모듈 src/phishstress/data/ 까지 무시된다.
+/data/
+/models/
 *.wav
 *.flac
 *.mp3

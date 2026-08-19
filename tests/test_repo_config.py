@@ -94,3 +94,56 @@ class TestReadme:
         for rel in ("docs/PROJECT_CHARTER.md", "docs/RED_TEAM_REVIEW.md", "docs/ETHICS.md"):
             assert rel in readme
             assert (REPO_ROOT / rel).is_file(), f"{rel} 파일이 없습니다"
+
+
+class TestPackaging:
+    """소스가 조용히 누락되는 사고를 막는다.
+
+    Day 3에 `.gitignore`의 `data/` 패턴이 내려받은 원본 데이터뿐 아니라
+    소스 모듈 `src/phishstress/data/` 까지 무시했다. 그대로 커밋했다면 클론한
+    저장소에서 패키지가 임포트조차 되지 않았을 것이다. 로컬에서는 파일이 있으니
+    테스트가 전부 통과해서 눈치채기 어렵다.
+    """
+
+    def test_no_source_file_is_gitignored(self):
+        import subprocess
+
+        src = REPO_ROOT / "src"
+        files = [str(p.relative_to(REPO_ROOT)) for p in src.rglob("*.py")]
+        assert files, "src 아래에 파이썬 파일이 없습니다"
+        proc = subprocess.run(
+            # --no-index: 이미 추적 중인 파일도 패턴을 검사한다.
+            # 이 플래그가 없으면 git이 추적 파일을 건너뛰어 테스트가 항상 통과한다.
+            ["git", "check-ignore", "--no-index", "--stdin"],
+            input="\n".join(files),
+            capture_output=True,
+            text=True,
+            cwd=REPO_ROOT,
+        )
+        if proc.returncode == 128:
+            pytest.skip("git 저장소가 아닙니다")
+        ignored = [ln for ln in proc.stdout.splitlines() if ln.strip()]
+        assert not ignored, f".gitignore가 소스 파일을 무시하고 있습니다: {ignored}"
+
+    def test_every_package_dir_has_init(self):
+        """setuptools의 packages.find가 빠뜨리지 않도록."""
+        src = REPO_ROOT / "src" / "phishstress"
+        missing = [
+            str(d.relative_to(REPO_ROOT))
+            for d in src.rglob("*")
+            if d.is_dir() and d.name != "__pycache__" and not (d / "__init__.py").exists()
+        ]
+        assert not missing, f"__init__.py 가 없는 패키지 디렉터리: {missing}"
+
+    def test_declared_packages_are_importable(self):
+        import importlib
+
+        for mod in (
+            "phishstress.data",
+            "phishstress.detectors",
+            "phishstress.eval",
+            "phishstress.policy",
+            "phishstress.serving",
+            "phishstress.stress",
+        ):
+            importlib.import_module(mod)
